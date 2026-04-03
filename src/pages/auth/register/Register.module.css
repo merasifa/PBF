@@ -1,0 +1,40 @@
+.register {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  background-color: #ecf0f1;
+}
+
+.title {
+  color: #2c3e50;
+}
+
+.form {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input {
+  padding: 10px;
+  border: 1px solid #bdc3c7;
+  border-radius: 6px;
+}
+
+.button {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3498db;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.link {
+  color: #2c3e50;
+  font-weight: 600;
+}

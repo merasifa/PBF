@@ -1,0 +1,25 @@
+.error {
+	width: 100vw;
+	height: 100vh;
+	background-color: #fff;
+	color: #123432;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	text-align: center;
+
+	&__image {
+		width: 300px;
+	}
+
+	&__button {
+		margin-top: 1rem;
+		padding: 0.65rem 1.1rem;
+		border-radius: 8px;
+		background-color: #123432;
+		color: #fff;
+		text-decoration: none;
+		font-weight: 600;
+	}
+}
