@@ -1,7 +1,13 @@
 import Link from "next/link";
 
 type MainSectionProps = {
-  items: Array<{ id: number; name: string }>;
+  items: Array<{ 
+    id: string; 
+    name: string; 
+    price: number;
+    size: string;
+    category: string;
+  }>;
 };
 
 const MainSection = ({ items }: MainSectionProps) => {
@@ -19,7 +25,8 @@ const MainSection = ({ items }: MainSectionProps) => {
             className="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-300 hover:bg-blue-50"
           >
             <p className="text-lg font-bold text-slate-800">{item.name}</p>
-            <p className="mt-1 text-sm text-slate-500">Kategori umum</p>
+            <p className="mt-1 text-sm text-slate-500">{item.category}</p>
+            <p className="mt-2 text-sm text-slate-700">Harga: Rp {item.price.toLocaleString("id-ID")}</p>
             <Link
               href={`/produk/${item.id}`}
               className="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"

@@ -1,10 +1,37 @@
-import syles from './navbar.module.css';
+import styles from './navbar.module.css';
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 const Navbar = () => {
+    const {data} = useSession()
+    //const { data: session } = useSession()
+    // console.log("session", session)
     return (
-        <div className={syles.navbar}>
-            <div className="big">
-                Navbar
+        <div className={styles.navbar}>
+            <div className={styles.navbar__brand}>
+                MyApp
+            </div>
+
+            <div className={styles.navbar__right}>
+                {data ? (
+                    <>
+                        <div className={styles.navbar__user}>
+                            Welcome, {data.user?.fullname}
+                        </div>
+                        <button
+                            className={`${styles.navbar__button} ${styles["navbar__button--danger"]}`}
+                            onClick={() => signOut()}
+                        >
+                            Sign Out
+                        </button>
+                    </>
+                ) : (
+                    <button
+                        className={`${styles.navbar__button} ${styles["navbar__button--primary"]}`}
+                        onClick={() => signIn(undefined, { callbackUrl: '/profile' })}
+                    >
+                        Sign In
+                    </button>
+                )}
             </div>
         </div>
     );

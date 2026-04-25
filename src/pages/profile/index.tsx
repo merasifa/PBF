@@ -1,14 +1,13 @@
-import Link from 'next/link'
+import { useSession } from "next-auth/react";
 
-const ProfilePage = () => {
-	return (
-		<div>
-			<h1>Profile Page</h1>
-			<p>Nama: Tiara Mera Sifa</p>
-			<p>NIM: 2341720247</p>
-			<Link href="/profile/edit">Edit</Link>
-		</div>
-	)
+const HalamanProfile = () => {
+    const {data}:any = useSession();
+    return (
+        <div>
+            <h1>Halaman Profile</h1><br />
+            <h1>Selamat Datang {data?.user?.fullname}</h1>
+        </div>
+    )
 }
 
-export default ProfilePage
+export default HalamanProfile
