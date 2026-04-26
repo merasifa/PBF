@@ -1,11 +1,13 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { signIn } from "@/utils/db/servicefirebase"
+import GoogleProvider from "next-auth/providers/google"
+import GitHubProvider from "next-auth/providers/github"
+import { signIn, signInWithGoogle, signInWithGithub } from "@/utils/db/servicefirebase"
 import bcrypt from "bcrypt"
 
-export const authOptions:NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
@@ -14,7 +16,7 @@ export const authOptions:NextAuthOptions = {
       credentials: {
         fullname: { label: "Full Name", type: "text" },
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
@@ -34,13 +36,27 @@ export const authOptions:NextAuthOptions = {
               email: user.email,
               fullname: user.fullname,
               role: user.role,
+              type: "credentials",
             }
           }
         }
 
         return null
-      }
-    })
+      },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      authorization: {
+        params: {
+          prompt: "select_account",
+        },
+      },
+    }),
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+    }),
   ],
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,8 +65,49 @@ export const authOptions:NextAuthOptions = {
         token.email = user.email
         token.fullname = user.fullname
         token.role = user.role
+        token.type = account.provider
       }
-      //  console.log("jwt callback", { token, account, user })
+
+      if ((account?.provider === "google" || account?.provider === "github") && user) {
+        const data = {
+          fullname: user.name,
+          email: user.email,
+          image: user.image,
+          type: account.provider,
+        }
+
+        await new Promise<void>((resolve) => {
+          const callback = (result: {
+            status: boolean;
+            message: string;
+            data?: {
+              id?: string;
+              email: string;
+              fullname?: string;
+              image?: string;
+              role?: string;
+              type?: string;
+            };
+          }) => {
+            if (result.status && result.data) {
+              token.role = result.data.role
+            }
+            resolve()
+          }
+
+          if (account.provider === "google") {
+            signInWithGoogle(data, callback)
+          } else {
+            signInWithGithub(data, callback)
+          }
+        })
+
+        token.fullname = data.fullname
+        token.email = data.email
+        token.image = data.image
+        token.type = data.type
+      }
+
       return token
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -61,10 +118,16 @@ export const authOptions:NextAuthOptions = {
       if (token.fullname) {
         session.user.fullname = token.fullname
       }
+      if (token.image) {
+        session.user.image = token.image
+      }
       if (token.role) {
         session.user.role = token.role
       }
-      //  console.log("session callback", { session, token })
+      if (token.type) {
+        session.user.type = token.type
+      }
+
       return session
     },
   },

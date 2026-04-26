@@ -23,16 +23,20 @@ const TampilanLogin = () => {
 				: "/";
 	const [error, setError] = useState("");
 
-	const handleSubmit = async (event: any) => {
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setError("");
 		setIsLoading(true);
+		const form = event.currentTarget as HTMLFormElement & {
+			email: { value: string };
+			password: { value: string };
+		};
 
 		try {
 			const res = await signIn("credentials", {
 				redirect: false,
-				email: event.target.email.value,
-				password: event.target.password.value,
+				email: form.email.value,
+				password: form.password.value,
 				callbackUrl,
 			});
 
@@ -43,7 +47,7 @@ const TampilanLogin = () => {
 				setIsLoading(false);
 				setError(mapAuthError(res.error));
 			}
-		} catch (error) {
+		} catch {
 			setIsLoading(false);
 			setError("wrong email or password");
 		}
@@ -88,6 +92,24 @@ const TampilanLogin = () => {
 							disabled={isLoading}
 						>
 							{isLoading ? "Loading..." : "login"}
+						</button>
+						<br />
+						<button
+							type="button"
+							onClick={() => signIn("google", { callbackUrl })}
+							className={style.login__form__item__button}
+							disabled={isLoading}
+						>
+							{isLoading ? "Loading..." : "sign in with google"}
+						</button>
+						<br />
+						<button
+							type="button"
+							onClick={() => signIn("github", { callbackUrl })}
+							className={style.login__form__item__button}
+							disabled={isLoading}
+						>
+							{isLoading ? "Loading..." : "sign in with github"}
 						</button>
 						<br />
 						<p className={style.login__form__item__text}>
