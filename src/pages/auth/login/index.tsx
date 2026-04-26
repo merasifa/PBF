@@ -1,7 +1,11 @@
-import TampilanLogin from "@/views/auth/Login";
+import TampilanLogin from "../../../views/auth/login";
 
-const LoginPage = () => {
-	return <TampilanLogin />;
+const halamanLogin = () => {
+	return (
+		<>
+			<TampilanLogin />
+		</>
+	);
 };
 
-export default LoginPage;
+export default halamanLogin;

@@ -1,5 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { signIn } from "@/utils/db/servicefirebase"
+import bcrypt from "bcrypt"
 
 export const authOptions:NextAuthOptions = {
   session: {
@@ -15,33 +17,40 @@ export const authOptions:NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
+        if (!credentials?.email || !credentials?.password) return null
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const user: any = await signIn(credentials.email)
+
+        if (user) {
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.password,
+          )
+
+          if (isPasswordValid) {
+            return {
+              id: user.id,
+              email: user.email,
+              fullname: user.fullname,
+              role: user.role,
+            }
+          }
         }
 
-        const user = {
-          id: "1",
-          email: credentials?.email,
-          password: credentials?.password,
-          fullname: credentials?.fullname
-        }
-        if (user) {
-          // console.log("user", user)
-          return user
-        }else {
-          return null
-        }
+        return null
       }
     })
   ],
   callbacks: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-    async jwt({ token, account, _profile, user }: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async jwt({ token, account, user }: any) {
       if (account?.provider === "credentials" && user) {
         token.email = user.email
         token.fullname = user.fullname
+        token.role = user.role
       }
-      //  console.log("jwt callback", { token, account, _profile, user })
+      //  console.log("jwt callback", { token, account, user })
       return token
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,9 +61,15 @@ export const authOptions:NextAuthOptions = {
       if (token.fullname) {
         session.user.fullname = token.fullname
       }
+      if (token.role) {
+        session.user.role = token.role
+      }
       //  console.log("session callback", { session, token })
       return session
     },
+  },
+  pages: {
+    signIn: "/auth/login",
   },
 }
 
