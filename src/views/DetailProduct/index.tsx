@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from "next/image";
 import { ProductType } from "../../types/Product.type";
 import styles from "./detailProduct.module.scss";
 
@@ -8,7 +8,13 @@ const DetailProduk = ({ products }: { products: ProductType }) => {
 			<h1 className={styles.title}>Detail Produk</h1>
 			<div className={styles.produkdetail}>
 				<div className={styles.produkdetail_image}>
-					<img src={products.image && products.image} alt={products.name} />
+					<Image
+						src={products.image && products.image}
+						alt={products.name}
+						fill
+						sizes="(max-width: 768px) 100vw, 400px"
+						style={{ objectFit: "cover" }}
+					/>
 				</div>
 
 				<div className={styles.produkdetail_info}>

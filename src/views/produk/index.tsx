@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from "next/image";
 import styles from "./produk.module.scss";
 import Link from "next/link";
 import { ProductType } from "../../types/Product.type";
@@ -27,7 +27,15 @@ const TampilkanProduk = ({ products, isLoading, isError }: ProdukProps) => {
           products.map((products: ProductType) => (
             <Link href={`/produk/${products.id}`} key={products.id} className={styles.produk__content__item}>
               <div className={styles.produk__content__item__image}>
-                <img src={products.image} alt={products.name} width={200} />
+                <Image
+                  src={products.image}
+                  alt={products.name}
+                  width={400}
+                  height={400}
+                  unoptimized
+                  sizes="(max-width: 768px) 50vw, 200px"
+                  style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center" }}
+                />
               </div>
               <h4 className={styles.produk__content__item__name}>
                 {products.name}
